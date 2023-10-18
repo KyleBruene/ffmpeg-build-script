@@ -21,6 +21,10 @@ LATEST=false
 MANPAGES=1
 CURRENT_PACKAGE_VERSION=0
 
+apt-get install xxd vim build-essential wget libz-dev curl python3 python3-pip python3-setuptools python3-wheel ninja-build doxygen -y
+
+curl https://sh.rustup.rs -sSf | sh
+
 # Check for Apple Silicon
 if [[ ("$(uname -m)" == "arm64") && ("$OSTYPE" == "darwin"*) ]]; then
   # If arm64 AND darwin (macOS)
@@ -517,7 +521,7 @@ if build "vmaf" "2.3.1"; then
   cd "${PACKAGES}"/vmaf-2.3.1/libvmaf/
   export PATH="$PATH:$HOME/.local/bin"
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/x86_64-linux-gnu/
-  execute meson build --buildtype release
+  execute meson build --buildtype release -Dbuilt_in_models=true
   execute ninja -vC build install
   build_done "vmaf" "2.3.1"
 fi
