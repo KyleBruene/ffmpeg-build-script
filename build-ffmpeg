@@ -9,7 +9,8 @@ SCRIPT_VERSION=1.47
 CWD=$(pwd)
 PACKAGES="$CWD/packages"
 WORKSPACE="$CWD/workspace"
-CFLAGS="-I$WORKSPACE/include"
+CFLAGS="-I$WORKSPACE/include -march=native -O2"
+CXXFLAGS="$CFLAGS"
 LDFLAGS="-L$WORKSPACE/lib"
 LDEXEFLAGS=""
 EXTRALIBS="-ldl -lpthread -lm -lz"
@@ -485,7 +486,7 @@ if command_exists "python3"; then
   fi
 fi
 
-if build "svtav1" "1.6.0"; then
+if build "svtav1" "1.7.0"; then
   # Last known working commit which passed CI Tests from HEAD branch
   download "https://gitlab.com/AOMediaCodec/SVT-AV1/-/archive/v$CURRENT_PACKAGE_VERSION/SVT-AV1-v$CURRENT_PACKAGE_VERSION.tar.gz" "svtav1-$CURRENT_PACKAGE_VERSION.tar.gz"
   cd "${PACKAGES}"/svtav1-$CURRENT_PACKAGE_VERSION//Build/linux || exit
@@ -510,6 +511,18 @@ if command_exists "cargo"; then
     CONFIGURE_OPTIONS+=("--enable-librav1e")
   fi
 fi
+
+if build "vmaf" "2.3.1"; then
+  download "https://github.com/Netflix/vmaf/archive/refs/tags/v2.3.1.tar.gz" "vmaf-2.3.1.tar.gz"
+  cd "${PACKAGES}"/vmaf-2.3.1/libvmaf/
+  export PATH="$PATH:$HOME/.local/bin"
+  execute meson build --buildtype release
+  execute ninja -vC build
+  execute ninja -vC build test
+  execute ninja -vC build install
+  build_done "vmaf" "2.3.1"
+fi
+CONFIGURE_OPTIONS+=("--enable-libvmaf")
 
 if $NONFREE_AND_GPL; then
 
