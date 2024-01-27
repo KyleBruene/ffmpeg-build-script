@@ -21,17 +21,21 @@ LATEST=false
 MANPAGES=1
 CURRENT_PACKAGE_VERSION=0
 
+# Install deps
 apt-get install xxd vim build-essential wget libz-dev curl python3-venv doxygen -y
 apt-get purge cargo rustc -y
 
 mkdir ~/.local/
 mkdir ~/.local/bin
 
+# Create venv and install deps
 python3 -m venv .venv-ffmpeg
 source .venv-ffmpeg/bin/activate
 pip install -U pip wheel meson ninja
 
+# Install Rust/Cargo
 curl https://sh.rustup.rs -sSf | sh -s -- -y
+. "$HOME/.cargo/env"
 
 # Check for Apple Silicon
 if [[ ("$(uname -m)" == "arm64") && ("$OSTYPE" == "darwin"*) ]]; then
