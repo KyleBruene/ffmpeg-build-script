@@ -21,12 +21,17 @@ LATEST=false
 MANPAGES=1
 CURRENT_PACKAGE_VERSION=0
 
-apt-get install xxd vim build-essential wget libz-dev curl python3 python3-pip python3-setuptools python3-wheel ninja-build doxygen -y
+apt-get install xxd vim build-essential wget libz-dev curl python3-venv doxygen -y
 apt-get purge cargo rustc -y
 
+mkdir ~/.local/
 mkdir ~/.local/bin
 
-curl https://sh.rustup.rs -sSf | sh
+python3 -m venv .venv-ffmpeg
+source .venv-ffmpeg/bin/activate
+pip install -U pip wheel meson ninja
+
+curl https://sh.rustup.rs -sSf | sh -s -- -y
 
 # Check for Apple Silicon
 if [[ ("$(uname -m)" == "arm64") && ("$OSTYPE" == "darwin"*) ]]; then
@@ -462,7 +467,7 @@ if command_exists "python3"; then
   # dav1d needs meson and ninja along with nasm to be built
   if command_exists "pip3"; then
     # meson and ninja can be installed via pip3
-    execute apt-get install meson python3-setuptools
+    echo "pip exists"
   fi
   if command_exists "meson"; then
     if build "dav1d" "1.1.0"; then
@@ -488,7 +493,7 @@ if command_exists "python3"; then
   fi
 fi
 
-if build "svtav1" "1.7.0"; then
+if build "svtav1" "1.8.0"; then
   # Last known working commit which passed CI Tests from HEAD branch
   download "https://gitlab.com/AOMediaCodec/SVT-AV1/-/archive/v$CURRENT_PACKAGE_VERSION/SVT-AV1-v$CURRENT_PACKAGE_VERSION.tar.gz" "svtav1-$CURRENT_PACKAGE_VERSION.tar.gz"
   cd "${PACKAGES}"/svtav1-$CURRENT_PACKAGE_VERSION//Build/linux || exit
@@ -514,14 +519,14 @@ if command_exists "cargo"; then
   fi
 fi
 
-if build "vmaf" "2.3.1"; then
-  download "https://github.com/Netflix/vmaf/archive/refs/tags/v2.3.1.tar.gz" "vmaf-2.3.1.tar.gz"
-  cd "${PACKAGES}"/vmaf-2.3.1/libvmaf/
+if build "vmaf" "3.0.0"; then
+  download "https://github.com/Netflix/vmaf/archive/refs/tags/v3.0.0.tar.gz" "vmaf-3.0.0.tar.gz"
+  cd "${PACKAGES}"/vmaf-3.0.0/libvmaf/
   export PATH="$PATH:$HOME/.local/bin"
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/x86_64-linux-gnu/
   execute meson build --buildtype release -Dbuilt_in_models=true
   execute ninja -vC build install
-  build_done "vmaf" "2.3.1"
+  build_done "vmaf" "3.0.0"
 fi
 CONFIGURE_OPTIONS+=("--enable-libvmaf")
 
