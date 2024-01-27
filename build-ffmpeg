@@ -985,7 +985,7 @@ if [ -d "$CWD/.git" ]; then
 fi
 
 build "ffmpeg" "$FFMPEG_VERSION"
-download "https://github.com/jellyfin/jellyfin-ffmpeg/archive/refs/tags/v6.0-7.tar.gz" "FFmpeg-release-$FFMPEG_VERSION.tar.gz"
+download "https://api.github.com/repos/FFmpeg/FFmpeg/tarball/master" "FFmpeg-release-$FFMPEG_VERSION.tar.gz"
 # shellcheck disable=SC2086
 ./configure "${CONFIGURE_OPTIONS[@]}" \
   --disable-debug \
