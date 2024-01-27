@@ -31,7 +31,7 @@ mkdir ~/.local/bin
 # Create venv and install deps
 python3 -m venv .venv-ffmpeg
 source .venv-ffmpeg/bin/activate
-pip install -U pip wheel meson ninja
+pip install -U pip wheel meson ninja asciidoc 
 
 # Install Rust/Cargo
 curl https://sh.rustup.rs -sSf | sh -s -- -y
@@ -724,14 +724,14 @@ if command_exists "python3"; then
       execute ninja -C build install
       build_done "sord" $CURRENT_PACKAGE_VERSION
     fi
-    if build "sratom" "0.6.14"; then
+    if build "sratom" "0.6.16"; then
       download "https://gitlab.com/lv2/sratom/-/archive/v$CURRENT_PACKAGE_VERSION/sratom-v$CURRENT_PACKAGE_VERSION.tar.gz" "sratom-v$CURRENT_PACKAGE_VERSION.tar.gz"
       execute meson build --prefix="${WORKSPACE}" --buildtype=release --default-library=static --libdir="${WORKSPACE}"/lib
       execute ninja -C build
       execute ninja -C build install
       build_done "sratom" $CURRENT_PACKAGE_VERSION
     fi
-    if build "lilv" "0.24.20"; then
+    if build "lilv" "0.24.24"; then
       download "https://gitlab.com/lv2/lilv/-/archive/v$CURRENT_PACKAGE_VERSION/lilv-v$CURRENT_PACKAGE_VERSION.tar.gz" "lilv-v$CURRENT_PACKAGE_VERSION.tar.gz"
       execute meson build --prefix="${WORKSPACE}" --buildtype=release --default-library=static --libdir="${WORKSPACE}"/lib
       execute ninja -C build
