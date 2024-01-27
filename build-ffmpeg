@@ -717,7 +717,7 @@ if command_exists "python3"; then
       execute make install
       build_done "pcre" $CURRENT_PACKAGE_VERSION
     fi
-    if build "sord" "0.16.14"; then
+    if build "sord" "0.16.16"; then
       download "https://gitlab.com/drobilla/sord/-/archive/v$CURRENT_PACKAGE_VERSION/sord-v$CURRENT_PACKAGE_VERSION.tar.gz" "sord-v$CURRENT_PACKAGE_VERSION.tar.gz"
       execute meson build --prefix="${WORKSPACE}" --buildtype=release --default-library=static --libdir="${WORKSPACE}"/lib
       execute ninja -C build
