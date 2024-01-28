@@ -22,7 +22,7 @@ MANPAGES=1
 CURRENT_PACKAGE_VERSION=0
 
 # Install deps
-apt-get install xxd vim build-essential wget libz-dev curl python3-venv doxygen -y
+apt-get install xxd vim build-essential wget libz-dev curl python3-venv doxygen libva-dev vainfo -y
 apt-get purge cargo rustc -y
 
 mkdir ~/.local/
@@ -36,14 +36,6 @@ pip install -U pip wheel meson ninja asciidoc
 # Install Rust/Cargo
 curl https://sh.rustup.rs -sSf | sh -s -- -y
 . "$HOME/.cargo/env"
-
-# Check for Apple Silicon
-if [[ ("$(uname -m)" == "arm64") && ("$OSTYPE" == "darwin"*) ]]; then
-  # If arm64 AND darwin (macOS)
-  export ARCH=arm64
-  export MACOSX_DEPLOYMENT_TARGET=11.0
-  MACOS_M1=true
-fi
 
 # Speed up the process
 # Env Var NUMJOBS overrides automatic detection
@@ -249,29 +241,21 @@ while (($# > 0)); do
     if [[ "$1" == "--build" || "$1" =~ '-b' ]]; then
       bflag='-b'
     fi
-    if [[ "$1" == "--enable-gpl-and-non-free" ]]; then
-      CONFIGURE_OPTIONS+=("--enable-nonfree")
-      CONFIGURE_OPTIONS+=("--enable-gpl")
-      NONFREE_AND_GPL=true
-    fi
+    
+    CONFIGURE_OPTIONS+=("--enable-nonfree")
+    CONFIGURE_OPTIONS+=("--enable-gpl")
+    NONFREE_AND_GPL=true
+    
     if [[ "$1" == "--cleanup" || "$1" =~ '-c' && ! "$1" =~ '--' ]]; then
       cflag='-c'
       cleanup
     fi
-    if [[ "$1" == "--full-static" ]]; then
-      if [[ "$OSTYPE" == "darwin"* ]]; then
-        echo "Error: A full static binary can only be build on Linux."
-        exit 1
-      fi
-      LDEXEFLAGS="-static"
-    fi
-    if [[ "$1" == "--latest" ]]; then
-      LATEST=true
-    fi
-    if [[ "$1" == "--small" ]]; then
-      CONFIGURE_OPTIONS+=("--enable-small" "--disable-doc")
-      MANPAGES=0
-    fi
+    LDEXEFLAGS="-static"
+    LATEST=true
+
+    CONFIGURE_OPTIONS+=("--enable-small" "--disable-doc")
+    MANPAGES=0
+    
     shift
     ;;
   *)
@@ -733,7 +717,7 @@ if command_exists "python3"; then
     fi
     if build "sratom" "0.6.16"; then
       download "https://gitlab.com/lv2/sratom/-/archive/v$CURRENT_PACKAGE_VERSION/sratom-v$CURRENT_PACKAGE_VERSION.tar.gz" "sratom-v$CURRENT_PACKAGE_VERSION.tar.gz"
-      execute meson build --prefix="${WORKSPACE}" --buildtype=release --default-library=static --libdir="${WORKSPACE}"/lib
+      execute meson build --prefix="${WORKSPACE}" --buildtype=release --default-library=static --libdir="${WORKSPACE}"/lib --docs=false --tests=false
       execute ninja -C build
       execute ninja -C build install
       build_done "sratom" $CURRENT_PACKAGE_VERSION
